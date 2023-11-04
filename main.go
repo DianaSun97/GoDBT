@@ -3,26 +3,33 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 // start main
 func main() {
 	botToken := os.Getenv("SECURITY_TOKEN")
 	//https: //api.telegram.org/bot<token>/METHOD_NAME.
-	botApi := "https://api.telegram.org/"
-	botUrl := botApi + botToken
+	botApi := "https://api.telegram.org/" + botToken
 	//возрат бесконечного цикла for
 	for {
-		update, err := getUpdates(botUrl)
+		updates, err := getUpdates(botApi)
 		if err != nil {
-			log.Println("Errors", err)
+			log.Println("Error:", err)
 		}
-		fmt.Println(update)
+
+		for _, update := range updates {
+			err := respond(botApi, update)
+			if err != nil {
+				log.Println("Error responding:", err)
+			}
+		}
+		// Ждем 1 секунду перед следующим запросом
+		time.Sleep(1 * time.Second)
 	}
 }
 
