@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -31,9 +32,9 @@ func getUpdates(botUrl string) ([]Update, error) {
 	if err != nil {
 		return nil, err
 	}
-	//закрываем тело ответа после обработки
+	//close body after updates
 	defer resp.Body.Close()
-	//io функция читает содержимое файла и возвращает его в виде среза байтов.
+	//io функция читает содержимое файла и возвращает его в виде массив байтов.
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
@@ -50,19 +51,20 @@ func getUpdates(botUrl string) ([]Update, error) {
 }
 
 // request
-func respond(botUrl string, update Update) {
+func respond(botUrl string, update Update) error {
 	var botMessage BotMessage
 	botMessage.ChatId = update.Message.Chat.ChatId
-	botMessage.Text = update.Message.Text
+	botMessage.Text = "Received: " + update.Message.Text
+
 	buf, err := json.Marshal(botMessage)
-	err = json.Unmarshal(body, &restResponce)
 	if err != nil {
 		return err
 	}
-	//contentType это хедер в http и его тип (например json)
-	err := http.Post(botUrl+"/sendMessage", "application/json", &buf)
+
+	_, err = http.Post(botUrl+"/sendMessage", "application/json", bytes.NewBuffer(buf))
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
