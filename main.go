@@ -28,7 +28,7 @@ func main() {
 				log.Println("Error responding:", err)
 			}
 		}
-		// Ждем 1 секунду перед следующим запросом
+		// wait 1 second before next request
 		time.Sleep(1 * time.Second)
 	}
 }
@@ -41,19 +41,19 @@ func getUpdates(botUrl string) ([]Update, error) {
 	}
 	//close body after updates
 	defer resp.Body.Close()
-	//io функция читает содержимое файла и возвращает его в виде массив байтов.
+	//io func read body file  and return  in type array bites.
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	var restResponce RestResponse
-	//указатель на структуру &??
+	//pointer to structure &
 	err = json.Unmarshal(body, &restResponce)
 	if err != nil {
 		return nil, err
 	}
 
-	//возращает массив обьекта
+	//returns an array of an object
 	return restResponce.Result, nil
 }
 
